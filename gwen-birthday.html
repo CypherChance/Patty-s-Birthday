@@ -78,6 +78,17 @@
     @keyframes unfold{from{transform:rotateX(-80deg) scale(.95);opacity:0}to{transform:rotateX(0) scale(1);opacity:1}}
     #loveBurst{position:fixed;inset:0;display:none;place-items:center;z-index:60;background:radial-gradient(circle at center, rgba(255,65,200,.18), rgba(0,0,0,.7));text-align:center;padding:20px}
     #loveBurst.show{display:grid}
+    #surpriseCard{position:fixed;inset:0;display:none;place-items:center;z-index:60;background:radial-gradient(circle at center, rgba(255,65,200,.18), rgba(0,0,0,.7));padding:20px}
+    #surpriseCard.show{display:grid}
+    .airplane-paper{width:280px;perspective:1000px;animation:planeFlyin .6s cubic-bezier(.34,.1,.68,.55) forwards}
+    @keyframes planeFlyin{0%{transform:translateX(-600px) rotateZ(-25deg) scale(.3);opacity:0}70%{transform:translateX(40px) rotateZ(2deg) scale(1.05)}100%{transform:translateX(0) rotateZ(0) scale(1);opacity:1}}
+    .paper-envelope{background:linear-gradient(135deg,#fff8f3,#fff);border:2px solid rgba(255,100,200,.4);border-radius:8px;padding:0;overflow:hidden;box-shadow:0 15px 40px rgba(255,79,216,.3),inset 0 1px 0 rgba(255,255,255,.8);animation:unfoldPaper .8s ease-out .3s both}
+    @keyframes unfoldPaper{0%{transform:rotateX(90deg) rotateY(0deg);opacity:.3}50%{opacity:.8}100%{transform:rotateX(0) rotateY(0);opacity:1}}
+    .paper-flap{position:relative;background:linear-gradient(180deg,#ffc8e6,#ffb3d9);padding:12px;text-align:center;border-bottom:1px solid rgba(255,100,200,.3);animation:flapOpen .6s ease-out .5s both}
+    @keyframes flapOpen{0%{transform:rotateX(0);height:140px}100%{transform:rotateX(0);height:auto}}
+    .paper-content{padding:20px;text-align:center}
+    .paper-message{font-size:1.1rem;line-height:1.6;color:#5a1a3a;font-family:"Comic Sans MS","Bradley Hand",cursive;font-weight:600;text-shadow:0 1px 2px rgba(255,255,255,.4)}
+    .paper-close{margin-top:12px;padding:8px 16px;background:linear-gradient(135deg,rgba(255,79,216,.4),rgba(200,79,216,.3));color:#fff;border:1px solid rgba(255,79,216,.6);border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem}
     .web-heart{width:150px;height:130px;margin:10px auto 14px;position:relative;filter:drop-shadow(0 0 14px rgba(255,99,225,.9))}
     .web-heart:before,.web-heart:after{content:"";position:absolute;width:76px;height:118px;border:3px solid #ff7ce5;border-radius:76px 76px 0 0;top:0;left:37px;transform:rotate(-45deg);transform-origin:0 100%}
     .web-heart:after{left:0;transform:rotate(45deg);transform-origin:100% 100%}
@@ -195,6 +206,19 @@
   <div id="letterModal2" class="modal"><article class="letter"><div class="flex justify-between items-center"><h4 class="comic text-xl font-bold text-pink-100">From Your Spider-Man</h4><button class="btn text-sm close-letter">Close</button></div><div class="mt-5 leading-relaxed text-pink-50/95 text-[1.02rem]"><p>You are my Gwen Stacy... and I am your Spider-Man. No matter which universe we’re in, I will always find you and love you. Happy Birthday, my everything. ❤️</p></div></article></div>
 
   <div id="loveBurst"><div><div class="web-heart"></div><h2 class="comic text-4xl sm:text-6xl font-extrabold text-pink-100">I LOVE YOU</h2><p class="mt-2 text-pink-50">Across every universe, always you. ❤️</p><button id="closeLoveBurst" class="btn mt-4">Close</button></div></div>
+  
+  <div id="surpriseCard">
+    <div class="airplane-paper">
+      <div class="paper-envelope">
+        <div class="paper-flap"></div>
+        <div class="paper-content">
+          <div class="paper-message" id="surpriseMessage">From your Spider-Man: You are my favorite universe. ❤️</div>
+          <button class="paper-close" id="closeSurpriseCard">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="toast"></div>
 
   <script type="module">
@@ -228,7 +252,7 @@
       letterModal1:$("letterModal1"), letterModal2:$("letterModal2"), ytPlayer:$("ytPlayer"), playerPlaceholder:$("playerPlaceholder"),
       songUrlInput:$("songUrlInput"), addSongBtn:$("addSongBtn"), songList:$("songList"), bucketInput:$("bucketInput"), addBucketBtn:$("addBucketBtn"),
       bucketList:$("bucketList"), maskSurprise:$("maskSurprise"), loveBurst:$("loveBurst"), closeLoveBurst:$("closeLoveBurst"),
-      installBtn:$("installBtn"), canvas:$("bgCanvas"), syncStatus:$("syncStatus")
+      installBtn:$("installBtn"), canvas:$("bgCanvas"), syncStatus:$("syncStatus"), surpriseCard:$("surpriseCard"), closeSurpriseCard:$("closeSurpriseCard"), surpriseMessage:$("surpriseMessage")
     };
     const uid = () => Math.random().toString(36).slice(2, 11);
     const saveLocal = (k,v) => localStorage.setItem(k, JSON.stringify(v));
@@ -278,7 +302,12 @@
 
     // Surprise mask messages
     const surprise = ["From your Spider-Man: You are my favorite universe. ❤️","I still fall for you every single day, Gwen.","No multiverse could ever replace you. 🕸️","You + Me = forever swinging together."];
-    els.maskSurprise.addEventListener("click", () => toast(surprise[Math.floor(Math.random()*surprise.length)]));
+    els.maskSurprise.addEventListener("click", () => {
+      els.surpriseMessage.textContent = surprise[Math.floor(Math.random()*surprise.length)];
+      els.surpriseCard.classList.add("show");
+    });
+    els.closeSurpriseCard.addEventListener("click", () => els.surpriseCard.classList.remove("show"));
+    els.surpriseCard.addEventListener("click", (e) => { if(e.target===els.surpriseCard) els.surpriseCard.classList.remove("show"); });
 
     // YouTube
     function parseYoutube(url){
