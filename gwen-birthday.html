@@ -29,8 +29,8 @@
     .web-loader::after{inset:26px;border-color:rgba(255,255,255,.55)}
     .spokes{position:absolute;inset:0;background:linear-gradient(0deg, transparent 49%, rgba(255,160,240,.8) 50%, transparent 51%),linear-gradient(30deg, transparent 49%, rgba(255,160,240,.8) 50%, transparent 51%),linear-gradient(60deg, transparent 49%, rgba(255,160,240,.8) 50%, transparent 51%),linear-gradient(90deg, transparent 49%, rgba(255,160,240,.8) 50%, transparent 51%),linear-gradient(120deg, transparent 49%, rgba(255,160,240,.8) 50%, transparent 51%),linear-gradient(150deg, transparent 49%, rgba(255,160,240,.8) 50%, transparent 51%);border-radius:50%;filter:drop-shadow(0 0 8px rgba(255,79,216,.7));animation:spin 8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}} @keyframes pulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.06);opacity:1}}
-    .cake-wrap{display:flex;justify-content:center;width:100%;filter:drop-shadow(0 0 25px rgba(255,79,216,.35))}
-    .cake{width:min(78vw,360px);position:relative}
+    .cake-wrap{display:flex;justify-content:center;align-items:center;width:100%;margin-inline:auto;filter:drop-shadow(0 0 25px rgba(255,79,216,.35))}
+    .cake{width:clamp(210px,64vw,360px);position:relative}
     .layer{border-radius:16px;border:2px solid rgba(255,210,250,.5);background:linear-gradient(180deg,#ff8ce4 0%,#ff5ecf 40%,#de2aa7 100%);box-shadow:inset 0 -10px 0 rgba(0,0,0,.12),0 0 18px rgba(255,79,216,.45);position:relative}
     .layer.top{height:88px;width:72%;margin:0 auto;z-index:2}
     .layer.bottom{height:104px;width:100%;margin-top:-8px;z-index:1}
@@ -52,8 +52,18 @@
     @keyframes confetti{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--x),var(--y)) scale(.2) rotate(260deg);opacity:0}}
     .drawer{position:fixed;top:94px;right:10px;width:min(88vw,310px);max-height:calc(100dvh - 108px);overflow:auto;transform:translateX(calc(100% + 20px));transition:transform .35s ease;z-index:20}
     .drawer.open{transform:translateX(0)}
-    .music-panel{position:fixed;left:10px;bottom:10px;width:min(96vw,410px);z-index:18;max-height:48dvh;overflow:auto}
-    .bucket-panel{position:fixed;right:10px;bottom:10px;width:min(90vw,320px);z-index:19;max-height:42dvh;overflow:auto}
+    /* Mobile-first: stack panels to avoid squeezed layout. */
+    .music-panel,.bucket-panel{
+      position:relative;
+      left:auto;
+      right:auto;
+      bottom:auto;
+      width:min(96vw,680px);
+      margin:14px auto 0;
+      z-index:8;
+      max-height:none;
+      overflow:visible
+    }
     .btn{border:1px solid rgba(255,170,237,.6);background:linear-gradient(135deg,rgba(255,79,216,.26),rgba(130,61,255,.18));color:#fff;border-radius:12px;padding:8px 12px;box-shadow:0 0 12px rgba(255,79,216,.2)}
     .chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,200,240,.35);border-radius:10px}
     #maskSurprise{position:fixed;right:12px;top:70px;z-index:35;width:46px;height:46px;border-radius:999px;border:1px solid rgba(255,200,245,.55);background:linear-gradient(145deg,#2b1036,#18081f);display:grid;place-items:center;box-shadow:0 0 20px rgba(255,79,216,.35);cursor:pointer}
@@ -69,7 +79,19 @@
     .web-heart{width:150px;height:130px;margin:10px auto 14px;position:relative;filter:drop-shadow(0 0 14px rgba(255,99,225,.9))}
     .web-heart:before,.web-heart:after{content:"";position:absolute;width:76px;height:118px;border:3px solid #ff7ce5;border-radius:76px 76px 0 0;top:0;left:37px;transform:rotate(-45deg);transform-origin:0 100%}
     .web-heart:after{left:0;transform:rotate(45deg);transform-origin:100% 100%}
-    @media (min-width:1024px){.drawer{right:16px;width:330px;transform:translateX(0)}#openDrawerBtn{display:none}.music-panel{left:16px;width:430px}.bucket-panel{right:16px;bottom:16px}#maskSurprise{right:22px;top:26px}}
+    @media (max-width:640px){
+      main{padding-inline:12px}
+      .cake{width:clamp(200px,72vw,300px)}
+      .drawer{top:86px;right:8px;width:min(92vw,320px)}
+    }
+    @media (min-width:1024px){
+      main{max-width:980px;margin-inline:auto}
+      .drawer{right:16px;width:330px;transform:translateX(0)}
+      #openDrawerBtn{display:none}
+      .music-panel{position:fixed;left:16px;bottom:16px;width:430px;max-height:48dvh;overflow:auto;margin:0}
+      .bucket-panel{position:fixed;right:16px;bottom:16px;width:320px;max-height:42dvh;overflow:auto;margin:0}
+      #maskSurprise{right:22px;top:26px}
+    }
   </style>
 </head>
 <body>
