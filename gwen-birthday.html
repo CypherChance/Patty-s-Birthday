@@ -83,6 +83,8 @@
       main{padding-inline:12px}
       .cake{width:clamp(200px,72vw,300px)}
       .drawer{top:86px;right:8px;width:min(92vw,320px)}
+      /* Extra space on phones so the cake matches desktop vertical placement. */
+      #cakeSection{ margin-top: 7.5rem !important; }
     }
     @media (min-width:1024px){
       main{max-width:980px;margin-inline:auto}
@@ -132,7 +134,7 @@
       <p class="mt-2 text-pink-100/90 text-sm sm:text-base comic">In every universe, my heart still swings back to you.</p>
     </header>
 
-    <section class="mt-16 sm:mt-10">
+    <section id="cakeSection" class="mt-16 sm:mt-10">
       <div class="cake-wrap">
         <div class="cake">
           <div class="candles"><div class="candle"><div class="flame"></div></div><div class="candle"><div class="flame" style="animation-delay:.05s"></div></div><div class="candle"><div class="flame" style="animation-delay:.09s"></div></div><div class="candle"><div class="flame" style="animation-delay:.03s"></div></div></div>
@@ -358,7 +360,32 @@
     window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; els.installBtn.classList.remove("hidden"); });
     els.installBtn.addEventListener("click", async () => { if(!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; els.installBtn.classList.add("hidden"); });
     if("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost")){
-      const swCode = `const CACHE="gwen29-v1";self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(["./","./gwen-birthday.html"])).then(()=>self.skipWaiting()))});self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{const copy=r.clone();caches.open(CACHE).then(cache=>cache.put(e.request,copy));return r}).catch(()=>c)))})`;
+      // Network-first so updates to the HTML/CSS reflect immediately on phones.
+      const swCode = `const CACHE="gwen29-v2";
+self.addEventListener("install",e=>{
+  e.waitUntil(
+    caches.open(CACHE).then(c=>c.addAll(["./","./index.html","./gwen-birthday.html"]))
+      .then(()=>self.skipWaiting())
+  );
+});
+self.addEventListener("activate",e=>{
+  e.waitUntil(
+    caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
+      .then(()=>self.clients.claim())
+  );
+});
+self.addEventListener("fetch",e=>{
+  if(e.request.method!=="GET") return;
+  e.respondWith(
+    fetch(e.request)
+      .then(r=>{
+        const copy=r.clone();
+        caches.open(CACHE).then(cache=>cache.put(e.request,copy));
+        return r;
+      })
+      .catch(()=>caches.match(e.request))
+  );
+})`;
       const swBlob = new Blob([swCode], { type:"text/javascript" });
       navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
     }
