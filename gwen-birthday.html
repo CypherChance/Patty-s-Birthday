@@ -77,7 +77,8 @@
     .letter::before{content:"";position:absolute;inset:10px;border:1px dashed rgba(255,215,246,.45);border-radius:12px;pointer-events:none}
     @keyframes unfold{from{transform:rotateX(-80deg) scale(.95);opacity:0}to{transform:rotateX(0) scale(1);opacity:1}}
     #loveBurst{position:fixed;inset:0;display:none;place-items:center;z-index:60;background:radial-gradient(circle at center, rgba(255,65,200,.18), rgba(0,0,0,.7));text-align:center;padding:20px}
-    #loveBurst.show{display:grid}
+    #loveBurst.show{display:grid;animation:burstIn .5s cubic-bezier(.34,.1,.68,.55)}
+    @keyframes burstIn{0%{opacity:0;backdrop-filter:blur(0px)}100%{opacity:1;backdrop-filter:blur(6px)}}
     #surpriseCard{position:fixed;inset:0;display:none;place-items:center;z-index:60;background:radial-gradient(circle at center, rgba(255,65,200,.18), rgba(0,0,0,.7));padding:20px}
     #surpriseCard.show{display:grid}
     .airplane-paper{width:280px;perspective:1000px;animation:planeFlyin .6s cubic-bezier(.34,.1,.68,.55) forwards}
@@ -89,7 +90,17 @@
     .paper-content{padding:20px;text-align:center}
     .paper-message{font-size:1.1rem;line-height:1.6;color:#5a1a3a;font-family:"Comic Sans MS","Bradley Hand",cursive;font-weight:600;text-shadow:0 1px 2px rgba(255,255,255,.4)}
     .paper-close{margin-top:12px;padding:8px 16px;background:linear-gradient(135deg,rgba(255,79,216,.4),rgba(200,79,216,.3));color:#fff;border:1px solid rgba(255,79,216,.6);border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem}
-    .web-heart{width:150px;height:130px;margin:10px auto 14px;position:relative;filter:drop-shadow(0 0 14px rgba(255,99,225,.9))}
+    .love-nest{position:relative;width:min(90vw,420px);padding:40px 30px;background:radial-gradient(circle at 30% 30%, rgba(255,150,240,.25), transparent 50%),linear-gradient(135deg,rgba(255,200,240,.15),rgba(220,100,220,.12));border:2px solid rgba(255,100,200,.45);border-radius:24px;box-shadow:0 0 60px rgba(255,79,216,.4),inset 0 0 30px rgba(255,200,240,.15),0 0 40px rgba(255,150,240,.25);backdrop-filter:blur(8px);animation:nestGlow 3s ease-in-out infinite;position:relative}
+    @keyframes nestGlow{0%,100%{box-shadow:0 0 60px rgba(255,79,216,.4),inset 0 0 30px rgba(255,200,240,.15),0 0 40px rgba(255,150,240,.25)}50%{box-shadow:0 0 80px rgba(255,79,216,.55),inset 0 0 40px rgba(255,200,240,.25),0 0 60px rgba(255,150,240,.35)}}
+    .love-nest::before{content:"";position:absolute;inset:-8px;border-radius:24px;background:linear-gradient(45deg,transparent 0%,rgba(255,79,216,.1) 25%,transparent 50%,rgba(255,150,240,.1) 75%,transparent 100%);border:1px dashed rgba(255,100,200,.2);animation:webFloat 8s linear infinite;pointer-events:none}
+    @keyframes webFloat{0%{transform:rotate(0deg) scale(1)}100%{transform:rotate(360deg) scale(1)}}
+    .web-heart{width:150px;height:130px;margin:10px auto 14px;position:relative;filter:drop-shadow(0 0 14px rgba(255,99,225,.9));animation:heartPulse .5s ease-out;z-index:10}
+    @keyframes heartPulse{0%{transform:scale(0) rotate(-180deg);opacity:0}50%{transform:scale(1.15) rotate(0deg)}100%{transform:scale(1) rotate(0deg);opacity:1}}
+    .love-burst-heading{animation:textGlowIn .6s ease-out .2s both}
+    .love-burst-text{animation:textGlowIn .6s ease-out .3s both}
+    .love-burst-btn{animation:buttonAppear .5s ease-out .4s both}
+    @keyframes textGlowIn{0%{opacity:0;transform:translateY(20px);text-shadow:0 0 0 rgba(255,79,216,0)}100%{opacity:1;transform:translateY(0);text-shadow:0 0 8px rgba(255,79,216,.8),0 0 20px rgba(255,79,216,.4)}}
+    @keyframes buttonAppear{0%{opacity:0;transform:scale(0.7);box-shadow:0 0 0 rgba(255,79,216,0)}100%{opacity:1;transform:scale(1);box-shadow:0 0 20px rgba(255,79,216,.4)}}
     .web-heart:before,.web-heart:after{content:"";position:absolute;width:76px;height:118px;border:3px solid #ff7ce5;border-radius:76px 76px 0 0;top:0;left:37px;transform:rotate(-45deg);transform-origin:0 100%}
     .web-heart:after{left:0;transform:rotate(45deg);transform-origin:100% 100%}
     @media (max-width:640px){
@@ -205,7 +216,7 @@
   <div id="letterModal1" class="modal"><article class="letter"><div class="flex justify-between items-center"><h4 class="comic text-xl font-bold text-pink-100">For My Gwen</h4><button class="btn text-sm close-letter">Close</button></div><div class="mt-4 leading-relaxed text-pink-50/95 text-[0.98rem]"><p>My love,</p><p class="mt-3">[Replace this with your personal message.]</p><p class="mt-3">Forever yours,</p><p class="mt-1 text-pink-200 font-semibold">Your Spider-Man 🕷️❤️</p></div></article></div>
   <div id="letterModal2" class="modal"><article class="letter"><div class="flex justify-between items-center"><h4 class="comic text-xl font-bold text-pink-100">From Your Spider-Man</h4><button class="btn text-sm close-letter">Close</button></div><div class="mt-5 leading-relaxed text-pink-50/95 text-[1.02rem]"><p>You are my Gwen Stacy... and I am your Spider-Man. No matter which universe we’re in, I will always find you and love you. Happy Birthday, my everything. ❤️</p></div></article></div>
 
-  <div id="loveBurst"><div><div class="web-heart"></div><h2 class="comic text-4xl sm:text-6xl font-extrabold text-pink-100">I LOVE YOU</h2><p class="mt-2 text-pink-50">Across every universe, always you. ❤️</p><button id="closeLoveBurst" class="btn mt-4">Close</button></div></div>
+  <div id="loveBurst"><div class="love-nest"><div class="web-heart"></div><h2 class="comic text-4xl sm:text-6xl font-extrabold text-pink-100 love-burst-heading">I LOVE YOU</h2><p class="mt-2 text-pink-50 love-burst-text">Across every universe, always you. ❤️</p><button id="closeLoveBurst" class="btn mt-4 love-burst-btn">Close</button></div></div>
   
   <div id="surpriseCard">
     <div class="airplane-paper">
