@@ -37,7 +37,7 @@
     .icing{position:absolute;left:0;right:0;top:-10px;height:20px;border-radius:999px;background:linear-gradient(90deg,#fff,#ffd6f8,#fff);box-shadow:0 0 14px rgba(255,255,255,.45)}
     .plate{width:110%;margin:8px auto 0;height:18px;background:linear-gradient(90deg,#ffd4fb,#fff,#ffd4fb);border-radius:999px;box-shadow:0 0 18px rgba(255,255,255,.35);transform:translateX(-5%)}
     .cake-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;font-size:clamp(.62rem,1.7vw,.84rem);font-weight:700;color:#fff;text-shadow:0 0 8px rgba(0,0,0,.45),0 0 10px rgba(255,255,255,.45);z-index:5}
-    .candles{position:absolute;top:-30px;left:0;right:0;display:flex;justify-content:center;gap:18px;z-index:6}
+    .candles{position:absolute;top:-48px;left:0;right:0;display:flex;justify-content:center;gap:18px;z-index:6}
     header{position:relative;z-index:50}
     .candle{width:10px;height:42px;border-radius:8px;background:repeating-linear-gradient(-45deg,#fff 0 5px,#ffd1fa 5px 10px);position:relative;box-shadow:0 0 8px rgba(255,255,255,.45)}
     .flame{position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:12px;height:18px;border-radius:60% 60% 40% 40%;background:radial-gradient(circle at 50% 80%,#fff5a9 0%,#ff89d9 75%);box-shadow:0 0 14px rgba(255,149,223,.95),0 0 26px rgba(255,79,216,.6);animation:flicker .18s infinite alternate;transform-origin:50% 100%}
@@ -85,9 +85,7 @@
       .cake{width:clamp(200px,72vw,300px)}
       .drawer{top:86px;right:8px;width:min(92vw,320px)}
       /* Extra space on phones so the cake matches desktop vertical placement. */
-      #cakeSection{ margin-top: 7.5rem !important; }
-      /* Prevent candle flames from covering the top birthday header on phones. */
-      .candles{ top:-20px; gap:14px; }
+      #cakeSection{ margin-top: 10.5rem !important; }
     }
     @media (min-width:1024px){
       main{max-width:980px;margin-inline:auto}
