@@ -135,25 +135,18 @@
   <div class="corner-web br"><svg viewBox="0 0 200 200" fill="none" stroke="#ff9ff0" stroke-width="1.6"><path d="M0 0 Q90 80 200 100"/><path d="M0 0 Q80 70 160 80"/><path d="M0 0 Q70 60 130 62"/><path d="M0 0 Q60 48 100 45"/><path d="M0 0 L200 0 M0 0 L180 35 M0 0 L160 70 M0 0 L130 100"/></svg></div>
   <div id="balloonLayer"></div>
   <button id="maskSurprise" title="Spider-Man Surprise">
-    <svg viewBox="0 0 64 64" width="26" height="26" fill="none"><circle cx="32" cy="32" r="24" stroke="#ff84e8" stroke-width="2.6"/><path d="M14 34 C22 26, 42 26, 50 34" stroke="#fff" stroke-width="2.4"/><path d="M18 28 L28 26 L24 34 L16 34 Z" fill="#fff"/><path d="M46 28 L36 26 L40 34 L48 34 Z" fill="#fff"/></svg>
+    <img src="./spiderman-mask.png" alt="Spider-Man Mask" width="26" height="26" style="filter:drop-shadow(0 0 8px rgba(255,79,216,.6))">
   </button>
 
   <main class="min-h-screen pb-28 px-4 sm:px-6">
     <header class="pt-6 sm:pt-8 text-center">
       <div class="flex items-center justify-center gap-2 sm:gap-4">
         <span aria-hidden="true">
-          <svg width="34" height="34" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="24" stroke="#ff5fd7" stroke-width="2.2"/><path d="M14 34 C22 26, 42 26, 50 34" stroke="#fff" stroke-width="2"/><path d="M17 28 L28 26 L23 34 L16 34 Z" fill="#fff"/><path d="M47 28 L36 26 L41 34 L48 34 Z" fill="#fff"/></svg>
+          <img src="./spiderman-mask.png" alt="Spider-Man Mask" width="34" height="34" style="filter:drop-shadow(0 0 8px rgba(255,79,216,.6))">
         </span>
         <h1 class="comic text-[clamp(1.35rem,4.7vw,2.3rem)] font-extrabold leading-tight">Happy 29th Birthday, My Gwen Stacy ❤️</h1>
         <span aria-hidden="true">
-          <!-- More accurate Ghost-Spider style icon -->
-          <svg width="34" height="34" viewBox="0 0 64 64" fill="none">
-            <path d="M8 30 C8 15,20 6,32 6 C44 6,56 15,56 30 C56 44,45 56,32 58 C19 56,8 44,8 30 Z" stroke="#ffdffb" stroke-width="2.2" fill="rgba(255,255,255,0.06)"/>
-            <path d="M16 31 C20 24,28 21,32 21 C36 21,44 24,48 31" stroke="#fff" stroke-width="2"/>
-            <path d="M18 29 L29 25 L25 33 L16 33 Z" fill="#fff"/>
-            <path d="M46 29 L35 25 L39 33 L48 33 Z" fill="#fff"/>
-            <path d="M21 42 Q32 48 43 42" stroke="#ff7be4" stroke-width="2"/>
-          </svg>
+          <img src="./gwen-mask.png" alt="Gwen Stacy Mask" width="34" height="34" style="filter:drop-shadow(0 0 8px rgba(255,79,216,.6))">
         </span>
       </div>
       <p class="mt-2 text-pink-100/90 text-sm sm:text-base comic">In every universe, my heart still swings back to you.</p>
@@ -164,7 +157,7 @@
         <div class="cake">
           <div class="candles"><div class="candle"><div class="flame"></div></div><div class="candle"><div class="flame" style="animation-delay:.05s"></div></div><div class="candle"><div class="flame" style="animation-delay:.09s"></div></div><div class="candle"><div class="flame" style="animation-delay:.03s"></div></div></div>
           <div class="layer top"><div class="icing"></div></div>
-          <div class="layer bottom"><div class="icing"></div><div class="cake-text">Happy 29th Birthday, <span>[Her First Name]</span>!<br>From your Spider-Man</div></div>
+          <div class="layer bottom"><div class="icing"></div><div class="cake-text">Happy 29th Birthday, <span>Patty</span><br>From your Spider-Man</div></div>
           <div class="plate"></div>
         </div>
       </div>
@@ -223,7 +216,8 @@
       <div class="paper-envelope">
         <div class="paper-flap"></div>
         <div class="paper-content">
-          <div class="paper-message" id="surpriseMessage">From your Spider-Man: You are my favorite universe. ❤️</div>
+          <img src="./spiderman-gwen.png" alt="Spider-Man and Gwen together" style="width:100%;max-width:280px;border-radius:12px;margin-bottom:16px;box-shadow:0 0 20px rgba(255,79,216,.4)">
+          <div class="paper-message">Our love swings across every universe ❤️</div>
           <button class="paper-close" id="closeSurpriseCard">Close</button>
         </div>
       </div>
@@ -263,7 +257,7 @@
       letterModal1:$("letterModal1"), letterModal2:$("letterModal2"), ytPlayer:$("ytPlayer"), playerPlaceholder:$("playerPlaceholder"),
       songUrlInput:$("songUrlInput"), addSongBtn:$("addSongBtn"), songList:$("songList"), bucketInput:$("bucketInput"), addBucketBtn:$("addBucketBtn"),
       bucketList:$("bucketList"), maskSurprise:$("maskSurprise"), loveBurst:$("loveBurst"), closeLoveBurst:$("closeLoveBurst"),
-      installBtn:$("installBtn"), canvas:$("bgCanvas"), syncStatus:$("syncStatus"), surpriseCard:$("surpriseCard"), closeSurpriseCard:$("closeSurpriseCard"), surpriseMessage:$("surpriseMessage")
+      installBtn:$("installBtn"), canvas:$("bgCanvas"), syncStatus:$("syncStatus"), surpriseCard:$("surpriseCard"), closeSurpriseCard:$("closeSurpriseCard")
     };
     const uid = () => Math.random().toString(36).slice(2, 11);
     const saveLocal = (k,v) => localStorage.setItem(k, JSON.stringify(v));
@@ -314,7 +308,6 @@
     // Surprise mask messages
     const surprise = ["From your Spider-Man: You are my favorite universe. ❤️","I still fall for you every single day, Gwen.","No multiverse could ever replace you. 🕸️","You + Me = forever swinging together."];
     els.maskSurprise.addEventListener("click", () => {
-      els.surpriseMessage.textContent = surprise[Math.floor(Math.random()*surprise.length)];
       els.surpriseCard.classList.add("show");
     });
     els.closeSurpriseCard.addEventListener("click", () => els.surpriseCard.classList.remove("show"));
