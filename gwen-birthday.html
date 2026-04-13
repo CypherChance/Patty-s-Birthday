@@ -106,10 +106,10 @@
     .web-heart:before,.web-heart:after{content:"";position:absolute;width:76px;height:118px;border:3px solid #ff7ce5;border-radius:76px 76px 0 0;top:0;left:37px;transform:rotate(-45deg);transform-origin:0 100%}
     .web-heart:after{left:0;transform:rotate(45deg);transform-origin:100% 100%}
     .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-top:12px}
-    .photo-item{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;border:2px solid rgba(255,100,200,.3);box-shadow:0 0 12px rgba(255,79,216,.2);background:rgba(0,0,0,.3)}
-    .photo-item img{width:100%;height:100%;object-fit:cover}
-    .photo-delete{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;color:#ff6ddf;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:.75rem;opacity:0;transition:opacity .2s;z-index:10}
-    .photo-item:hover .photo-delete{opacity:1}
+    .photo-item{position:relative;aspect-ratio:1;border-radius:12px;overflow:visible;border:2px solid rgba(255,100,200,.3);box-shadow:0 0 12px rgba(255,79,216,.2);background:rgba(0,0,0,.3)}
+    .photo-item img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+    .photo-delete{position:absolute;top:2px;right:2px;background:rgba(255,79,216,.9);border:none;color:#fff;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:.75rem;font-weight:bold;z-index:50;opacity:1;transition:background .2s;pointer-events:auto}
+    .photo-delete:hover{background:rgba(255,79,216,1)}
     @media (max-width:640px){
       main{padding-inline:12px}
       .cake{width:clamp(200px,72vw,300px)}
@@ -437,7 +437,26 @@
       state.photos.forEach((photo) => {
         const div=document.createElement("div");
         div.className="photo-item";
-        div.innerHTML = `<img src="${photo.url}" alt="Memory" onload="this.style.opacity=1" onerror="this.closest('.photo-item').remove()" style="opacity:0;transition:opacity .3s"/><button class="photo-delete" data-id="${photo.id}">Delete</button>`;
+        const img = document.createElement("img");
+        img.src = photo.url;
+        img.alt = "Memory";
+        img.style.opacity = "0";
+        img.style.transition = "opacity .3s";
+        img.onload = () => { img.style.opacity = "1"; };
+        img.onerror = () => { div.remove(); };
+        const btn = document.createElement("button");
+        btn.className = "photo-delete";
+        btn.textContent = "✕";
+        btn.dataset.id = photo.id;
+        btn.type = "button";
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          state.photos = state.photos.filter((p) => p.id !== photo.id);
+          persistPhotos();
+          renderPhotos();
+        });
+        div.appendChild(img);
+        div.appendChild(btn);
         els.photoGrid.appendChild(div);
       });
     }
@@ -457,10 +476,7 @@
       reader.readAsDataURL(file);
     }
     els.addPhotoBtn.addEventListener("click", addPhoto);
-    els.photoGrid.addEventListener("click", (e) => {
-      const del = e.target.closest(".photo-delete");
-      if(del){ state.photos = state.photos.filter((p)=>p.id!==del.dataset.id); persistPhotos(); renderPhotos(); }
-    });
+
 
     // PWA install
     let deferredPrompt = null;
