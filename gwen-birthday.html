@@ -218,7 +218,7 @@
     <h3 class="comic text-base sm:text-lg font-bold text-pink-100">Great Memories 📸</h3>
     <p class="text-xs text-pink-100/80 mt-1">Our most precious moments.</p>
     <div class="mt-3 flex gap-2">
-      <input id="photoUrlInput" type="url" placeholder="Paste photo URL..." class="flex-1 rounded-xl px-3 py-2 text-sm bg-white/10 border border-pink-200/30 outline-none focus:ring-2 focus:ring-pink-300/55"/>
+      <input id="photoFileInput" type="file" accept="image/*" class="flex-1 rounded-xl px-3 py-2 text-sm bg-white/10 border border-pink-200/30 outline-none focus:ring-2 focus:ring-pink-300/55"/>
       <button id="addPhotoBtn" class="btn text-sm shrink-0">Add</button>
     </div>
     <div id="photoGrid" class="photo-grid"></div>
@@ -277,7 +277,7 @@
       songUrlInput:$("songUrlInput"), addSongBtn:$("addSongBtn"), songList:$("songList"), bucketInput:$("bucketInput"), addBucketBtn:$("addBucketBtn"),
       bucketList:$("bucketList"), maskSurprise:$("maskSurprise"), loveBurst:$("loveBurst"), closeLoveBurst:$("closeLoveBurst"),
       installBtn:$("installBtn"), canvas:$("bgCanvas"), syncStatus:$("syncStatus"), surpriseCard:$("surpriseCard"), closeSurpriseCard:$("closeSurpriseCard"),
-      photoUrlInput:$("photoUrlInput"), addPhotoBtn:$("addPhotoBtn"), photoGrid:$("photoGrid")
+      photoFileInput:$("photoFileInput"), addPhotoBtn:$("addPhotoBtn"), photoGrid:$("photoGrid")
     };
     const uid = () => Math.random().toString(36).slice(2, 11);
     const saveLocal = (k,v) => localStorage.setItem(k, JSON.stringify(v));
@@ -442,16 +442,21 @@
       });
     }
     function addPhoto(){
-      const url = els.photoUrlInput.value.trim();
-      if(!url) return;
-      state.photos.unshift({ id: uid(), url });
-      persistPhotos();
-      els.photoUrlInput.value = "";
-      renderPhotos();
-      toast("Photo added to Great Memories 📸");
+      const file = els.photoFileInput.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        state.photos.unshift({ id: uid(), url: dataUrl });
+        persistPhotos();
+        els.photoFileInput.value = "";
+        renderPhotos();
+        toast("Photo added to Great Memories 📸");
+      };
+      reader.onerror = () => toast("Failed to read file");
+      reader.readAsDataURL(file);
     }
     els.addPhotoBtn.addEventListener("click", addPhoto);
-    els.photoUrlInput.addEventListener("keydown", (e) => { if(e.key==="Enter") addPhoto(); });
     els.photoGrid.addEventListener("click", (e) => {
       const del = e.target.closest(".photo-delete");
       if(del){ state.photos = state.photos.filter((p)=>p.id!==del.dataset.id); persistPhotos(); renderPhotos(); }
