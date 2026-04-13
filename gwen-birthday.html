@@ -110,6 +110,22 @@
     .photo-item img{width:100%;height:100%;object-fit:cover;border-radius:10px}
     .photo-delete{position:absolute;top:2px;right:2px;background:rgba(255,79,216,.9);border:none;color:#fff;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:.75rem;font-weight:bold;z-index:50;opacity:1;transition:background .2s;pointer-events:auto}
     .photo-delete:hover{background:rgba(255,79,216,1)}
+    .photo-grid-book{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:16px;margin-top:20px}
+    .photo-book-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;place-items:center;padding:10px;z-index:70;backdrop-filter:blur(8px)}
+    .photo-book-modal.show{display:grid}
+    .photo-book{width:100%;max-width:min(95vw,900px);max-height:85vh;background:linear-gradient(135deg,rgba(255,182,193,.95),rgba(255,192,203,.9));border-radius:20px;padding:30px;box-shadow:0 20px 80px rgba(255,79,216,.5),inset 0 1px 0 rgba(255,255,255,.3);overflow-y:auto;position:relative;animation:bookOpen .6s cubic-bezier(.34,.1,.68,.55)}
+    @keyframes bookOpen{0%{transform:scale(.3) rotateY(90deg);opacity:0}50%{transform:scale(1.05) rotateY(0deg)}100%{transform:scale(1) rotateY(0deg);opacity:1}}
+    .close-book-btn{position:absolute;top:15px;right:15px;background:#fff;border:2px solid rgba(255,79,216,.5);color:#ff4fd8;border-radius:50%;width:40px;height:40px;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:80}
+    .close-book-btn:hover{background:rgba(255,79,216,.1);border-color:#ff4fd8}
+    .book-title{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;color:#d63384;text-shadow:0 2px 6px rgba(0,0,0,.2);margin:0 0 5px;text-align:center;font-family:Comic Sans MS,Bradley Hand,cursive}
+    .book-subtitle{font-size:.95rem;text-align:center;color:#c2185b;margin:0 0 20px;font-style:italic}
+    .book-content{max-height:calc(85vh - 180px);overflow-y:auto;padding-right:8px}
+    .book-content::-webkit-scrollbar{width:6px}
+    .book-content::-webkit-scrollbar-track{background:rgba(255,79,216,.1);border-radius:10px}
+    .book-content::-webkit-scrollbar-thumb{background:rgba(255,79,216,.5);border-radius:10px}
+    .book-content::-webkit-scrollbar-thumb:hover{background:rgba(255,79,216,.7)}
+    .add-photo-section{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+    .photo-file-input{flex:1;min-width:200px;padding:10px;border:2px dashed rgba(255,79,216,.5);border-radius:10px;background:rgba(255,255,255,.5);font-size:.9rem;color:#555;cursor:pointer}
     @media (max-width:640px){
       main{padding-inline:12px}
       .cake{width:clamp(200px,72vw,300px)}
@@ -214,15 +230,24 @@
     <ul id="bucketList" class="mt-3 space-y-2 text-sm"></ul>
   </section>
 
-  <section class="photo-panel panel rounded-2xl p-3 sm:p-4">
-    <h3 class="comic text-base sm:text-lg font-bold text-pink-100">Great Memories 📸</h3>
-    <p class="text-xs text-pink-100/80 mt-1">Our most precious moments.</p>
-    <div class="mt-3 flex gap-2">
-      <input id="photoFileInput" type="file" accept="image/*" class="flex-1 rounded-xl px-3 py-2 text-sm bg-white/10 border border-pink-200/30 outline-none focus:ring-2 focus:ring-pink-300/55"/>
-      <button id="addPhotoBtn" class="btn text-sm shrink-0">Add</button>
+  <div style="display:flex;justify-content:center;margin:20px 0">
+    <button id="openPhotoBook" class="btn text-sm" style="padding:12px 24px;font-size:1rem">📖 Open Great Memories</button>
+  </div>
+
+  <div id="photoBook" class="photo-book-modal">
+    <div class="photo-book">
+      <button id="closePhotoBook" class="close-book-btn">✕</button>
+      <h2 class="book-title">Great Memories 📸</h2>
+      <p class="book-subtitle">Our most precious moments.</p>
+      <div class="book-content">
+        <div class="add-photo-section">
+          <input id="photoFileInput" type="file" accept="image/*" class="photo-file-input"/>
+          <button id="addPhotoBtn" class="btn text-sm">+ Add Photo</button>
+        </div>
+        <div id="photoGrid" class="photo-grid-book"></div>
+      </div>
     </div>
-    <div id="photoGrid" class="photo-grid"></div>
-  </section>
+  </div>
 
   <div id="letterModal1" class="modal"><article class="letter"><div class="flex justify-between items-center"><h4 class="comic text-xl font-bold text-pink-100">For My Gwen</h4><button class="btn text-sm close-letter">Close</button></div><div class="mt-4 leading-relaxed text-pink-50/95 text-[0.98rem]"><p>My love,</p><p class="mt-3">[Replace this with your personal message.]</p><p class="mt-3">Forever yours,</p><p class="mt-1 text-pink-200 font-semibold">Your Spider-Man 🕷️❤️</p></div></article></div>
   <div id="letterModal2" class="modal"><article class="letter"><div class="flex justify-between items-center"><h4 class="comic text-xl font-bold text-pink-100">From Your Spider-Man</h4><button class="btn text-sm close-letter">Close</button></div><div class="mt-5 leading-relaxed text-pink-50/95 text-[1.02rem]"><p>You are my Gwen Stacy... and I am your Spider-Man. No matter which universe we’re in, I will always find you and love you. Happy Birthday, my everything. ❤️</p></div></article></div>
@@ -277,7 +302,7 @@
       songUrlInput:$("songUrlInput"), addSongBtn:$("addSongBtn"), songList:$("songList"), bucketInput:$("bucketInput"), addBucketBtn:$("addBucketBtn"),
       bucketList:$("bucketList"), maskSurprise:$("maskSurprise"), loveBurst:$("loveBurst"), closeLoveBurst:$("closeLoveBurst"),
       installBtn:$("installBtn"), canvas:$("bgCanvas"), syncStatus:$("syncStatus"), surpriseCard:$("surpriseCard"), closeSurpriseCard:$("closeSurpriseCard"),
-      photoFileInput:$("photoFileInput"), addPhotoBtn:$("addPhotoBtn"), photoGrid:$("photoGrid")
+      photoFileInput:$("photoFileInput"), addPhotoBtn:$("addPhotoBtn"), photoGrid:$("photoGrid"), photoBook:$("photoBook"), openPhotoBook:$("openPhotoBook"), closePhotoBook:$("closePhotoBook")
     };
     const uid = () => Math.random().toString(36).slice(2, 11);
     const saveLocal = (k,v) => localStorage.setItem(k, JSON.stringify(v));
@@ -476,7 +501,9 @@
       reader.readAsDataURL(file);
     }
     els.addPhotoBtn.addEventListener("click", addPhoto);
-
+    els.openPhotoBook.addEventListener("click", () => els.photoBook.classList.add("show"));
+    els.closePhotoBook.addEventListener("click", () => els.photoBook.classList.remove("show"));
+    els.photoBook.addEventListener("click", (e) => { if(e.target===els.photoBook) els.photoBook.classList.remove("show"); });
 
     // PWA install
     let deferredPrompt = null;
