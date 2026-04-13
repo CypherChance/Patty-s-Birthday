@@ -119,6 +119,8 @@
     .close-book-btn:hover{background:rgba(255,79,216,.1);border-color:#ff4fd8}
     .book-title{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;color:#d63384;text-shadow:0 2px 6px rgba(0,0,0,.2);margin:0 0 5px;text-align:center;font-family:Comic Sans MS,Bradley Hand,cursive}
     .book-subtitle{font-size:.95rem;text-align:center;color:#c2185b;margin:0 0 20px;font-style:italic}
+    .storage-info{font-size:.75rem;text-align:center;color:#666;background:rgba(0,0,0,.1);padding:8px;border-radius:8px;margin-bottom:15px}
+    .storage-info strong{color:#d63384}
     .book-content{max-height:calc(85vh - 180px);overflow-y:auto;padding-right:8px}
     .book-content::-webkit-scrollbar{width:6px}
     .book-content::-webkit-scrollbar-track{background:rgba(255,79,216,.1);border-radius:10px}
@@ -239,6 +241,10 @@
       <button id="closePhotoBook" class="close-book-btn">✕</button>
       <h2 class="book-title">Great Memories 📸</h2>
       <p class="book-subtitle">Our most precious moments.</p>
+      <div class="storage-info">
+        <span id="photoCount"><strong>Photos: 0</strong></span> | 
+        <span id="storageUsage"><strong>Storage: 0 MB / ~5 MB</strong></span>
+      </div>
       <div class="book-content">
         <div class="add-photo-section">
           <input id="photoFileInput" type="file" accept="image/*" class="photo-file-input"/>
@@ -302,7 +308,8 @@
       songUrlInput:$("songUrlInput"), addSongBtn:$("addSongBtn"), songList:$("songList"), bucketInput:$("bucketInput"), addBucketBtn:$("addBucketBtn"),
       bucketList:$("bucketList"), maskSurprise:$("maskSurprise"), loveBurst:$("loveBurst"), closeLoveBurst:$("closeLoveBurst"),
       installBtn:$("installBtn"), canvas:$("bgCanvas"), syncStatus:$("syncStatus"), surpriseCard:$("surpriseCard"), closeSurpriseCard:$("closeSurpriseCard"),
-      photoFileInput:$("photoFileInput"), addPhotoBtn:$("addPhotoBtn"), photoGrid:$("photoGrid"), photoBook:$("photoBook"), openPhotoBook:$("openPhotoBook"), closePhotoBook:$("closePhotoBook")
+      photoFileInput:$("photoFileInput"), addPhotoBtn:$("addPhotoBtn"), photoGrid:$("photoGrid"), photoBook:$("photoBook"), openPhotoBook:$("openPhotoBook"), closePhotoBook:$("closePhotoBook"),
+      photoCount:$("photoCount"), storageUsage:$("storageUsage")
     };
     const uid = () => Math.random().toString(36).slice(2, 11);
     const saveLocal = (k,v) => localStorage.setItem(k, JSON.stringify(v));
@@ -456,6 +463,25 @@
     });
 
     // Photo album
+    function updateStorageInfo(){
+      const photoCount = state.photos.length;
+      els.photoCount.textContent = `Photos: ${photoCount}`;
+      
+      // Calculate storage usage
+      const data = JSON.stringify(state.photos);
+      const bytes = new Blob([data]).size;
+      const mb = (bytes / 1024 / 1024).toFixed(2);
+      els.storageUsage.textContent = `Storage: ${mb} MB / ~5 MB`;
+      
+      // Warn if approaching limit
+      if(parseFloat(mb) > 4.5){
+        els.storageUsage.style.color = "#ff4fd8";
+        els.storageUsage.style.fontWeight = "bold";
+      } else {
+        els.storageUsage.style.color = "#666";
+        els.storageUsage.style.fontWeight = "normal";
+      }
+    }
     function renderPhotos(){
       els.photoGrid.innerHTML = "";
       if(!state.photos.length){ els.photoGrid.innerHTML = `<div class="text-pink-100/75 text-xs col-span-full py-4">No photos yet. Add your first memory 💕</div>`; return; }
@@ -484,6 +510,7 @@
         div.appendChild(btn);
         els.photoGrid.appendChild(div);
       });
+      updateStorageInfo();
     }
     function addPhoto(){
       const file = els.photoFileInput.files[0];
@@ -495,6 +522,7 @@
         persistPhotos();
         els.photoFileInput.value = "";
         renderPhotos();
+        updateStorageInfo();
         toast("Photo added to Great Memories 📸");
       };
       reader.onerror = () => toast("Failed to read file");
@@ -565,7 +593,7 @@ self.addEventListener("fetch",e=>{
         state.bucket = loadLocal(BUCKET_KEY, []);
         state.photos = loadLocal(PHOTOS_KEY, []);
         els.syncStatus.textContent = "Sync mode: localStorage only (single device)";
-        renderSongs(); renderBucket(); renderPhotos();
+        renderSongs(); renderBucket(); renderPhotos(); updateStorageInfo();
         return;
       }
       try{
@@ -576,7 +604,7 @@ self.addEventListener("fetch",e=>{
         onValue(songsRef, (snap) => { const val = snap.val(); state.songs = Array.isArray(val) ? val : []; renderSongs(); });
         onValue(bucketRef, (snap) => { const val = snap.val(); state.bucket = Array.isArray(val) ? val : []; renderBucket(); });
         state.photos = loadLocal(PHOTOS_KEY, []);
-        renderPhotos();
+        renderPhotos(); updateStorageInfo();
         els.syncStatus.textContent = "Sync mode: Firebase real-time (shared)";
         state.remote = true;
       } catch {
@@ -584,7 +612,7 @@ self.addEventListener("fetch",e=>{
         state.bucket = loadLocal(BUCKET_KEY, []);
         state.photos = loadLocal(PHOTOS_KEY, []);
         els.syncStatus.textContent = "Sync failed, fallback: localStorage only";
-        renderSongs(); renderBucket(); renderPhotos();
+        renderSongs(); renderBucket(); renderPhotos(); updateStorageInfo();
       }
     }
 
