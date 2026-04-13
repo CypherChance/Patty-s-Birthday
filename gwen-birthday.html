@@ -41,7 +41,7 @@
     /* Anchor candles to the cake top consistently (negative offset). */
     .candles{position:absolute;top:-48px;left:0;right:0;display:flex;justify-content:center;gap:18px;z-index:6}
     header{position:relative;z-index:50}
-    .dedication{position:absolute;top:-70px;left:50%;transform:translateX(-50%);text-align:center;z-index:7;animation:fadeInDown .8s ease-out}@keyframes fadeInDown{0%{opacity:0;transform:translateX(-50%) translateY(-20px)}100%{opacity:1;transform:translateX(-50%) translateY(0)}}.dedication-text{font-size:clamp(.75rem,2vw,1.1rem);font-weight:700;color:#fff;text-shadow:0 0 8px rgba(0,0,0,.5),0 0 12px rgba(255,79,216,.6);letter-spacing:.5px;font-family:"Comic Sans MS","Bradley Hand",cursive;line-height:1.5}.dedication-bottom{position:absolute;bottom:-95px;left:50%;transform:translateX(-50%);text-align:center;z-index:7;animation:fadeInUp .8s ease-out}@keyframes fadeInUp{0%{opacity:0;transform:translateX(-50%) translateY(20px)}100%{opacity:1;transform:translateX(-50%) translateY(0)}}.dedication-bottom-text{font-size:clamp(.75rem,2vw,1.1rem);font-weight:700;color:#fff;text-shadow:0 0 8px rgba(0,0,0,.5),0 0 12px rgba(255,79,216,.6);letter-spacing:.5px;font-family:"Comic Sans MS","Bradley Hand",cursive;line-height:1.5}
+    .layer-text{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:clamp(.65rem,1.8vw,.95rem);font-weight:700;color:#fff;text-shadow:0 0 8px rgba(0,0,0,.5),0 0 12px rgba(255,79,216,.6);letter-spacing:.5px;font-family:"Comic Sans MS","Bradley Hand",cursive;line-height:1.4;height:100%}
     .candle{width:10px;height:42px;border-radius:8px;background:repeating-linear-gradient(-45deg,#fff 0 5px,#ffd1fa 5px 10px);position:relative;box-shadow:0 0 8px rgba(255,255,255,.45)}
     .flame{position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:12px;height:18px;border-radius:60% 60% 40% 40%;background:radial-gradient(circle at 50% 80%,#fff5a9 0%,#ff89d9 75%);box-shadow:0 0 14px rgba(255,149,223,.95),0 0 26px rgba(255,79,216,.6);animation:flicker .18s infinite alternate;transform-origin:50% 100%}
     @keyframes flicker{from{transform:translateX(-50%) rotate(-2deg) scale(1);opacity:.95}to{transform:translateX(-50%) rotate(3deg) scale(1.06,.96);opacity:1}}
@@ -163,12 +163,10 @@
     <section id="cakeSection" class="mt-16 sm:mt-10">
       <div class="cake-wrap">
         <div class="cake">
-          <div class="dedication"><div class="dedication-text">Patty</div></div>
           <div class="candles"><div class="candle"><div class="flame"></div></div><div class="candle"><div class="flame" style="animation-delay:.05s"></div></div><div class="candle"><div class="flame" style="animation-delay:.09s"></div></div><div class="candle"><div class="flame" style="animation-delay:.03s"></div></div></div>
-          <div class="layer top"><div class="icing"></div></div>
-          <div class="layer bottom"><div class="icing"></div></div>
+          <div class="layer top"><div class="icing"></div><div class="layer-text">Patty</div></div>
+          <div class="layer bottom"><div class="icing"></div><div class="layer-text">Happy 29th Birthday<br><span style="font-size:0.9em;font-weight:600">From your Spider-Man</span></div></div>
           <div class="plate"></div>
-          <div class="dedication-bottom"><div class="dedication-bottom-text">Happy 29th Birthday<br><span style="font-size:0.9em;font-weight:600">From your Spider-Man</span></div></div>
         </div>
       </div>
     </section>
