@@ -240,6 +240,16 @@
     <ul id="bucketList" class="mt-3 space-y-2 text-sm"></ul>
   </section>
 
+  <section class="bucket-panel panel rounded-2xl p-3 sm:p-4">
+    <h3 class="text-xl font-bold text-pink-100" style="font-family:'Comic Sans MS','Bradley Hand',cursive">My Food Cravings 🍕</h3>
+    <p class="text-xs text-pink-100/80">Treats we should enjoy together.</p>
+    <div class="mt-3 flex gap-2">
+      <input id="foodInput" type="text" placeholder="What food do you crave?" class="flex-1 rounded-xl px-3 py-2 text-sm bg-white/10 border border-pink-200/30 outline-none focus:ring-2 focus:ring-pink-300/55"/>
+      <button id="addFoodBtn" class="btn text-sm">Add</button>
+    </div>
+    <ul id="foodList" class="mt-3 space-y-2 text-sm"></ul>
+  </section>
+
   <div style="display:flex;justify-content:center;margin:20px 0">
     <button id="openPhotoBook" class="btn text-sm" style="padding:12px 24px;font-size:1rem">📖 Open Great Memories</button>
   </div>
@@ -312,12 +322,13 @@
       roomId: "gwen-birthday-room"
     };
 
-    const state = { poppedCount: 0, balloonsAlive: 0, songs: [], bucket: [], photos: [], remote: false };
+    const state = { poppedCount: 0, balloonsAlive: 0, songs: [], bucket: [], photos: [], food: [], remote: false };
     const MAX_BALLOONS = 14;
     const BALLOON_COLORS = ["#ff6ddf", "#ffd8fa", "#111111", "#ff8be8", "#f7f0ff"];
     const SONG_KEY = "gwenSongs_v2";
     const BUCKET_KEY = "gwenBucket_v2";
     const PHOTOS_KEY = "gwenPhotos_v2";
+    const FOOD_KEY = "gwenFood_v2";
     const $ = (id) => document.getElementById(id);
     const els = {
       loading:$("loading"), balloonLayer:$("balloonLayer"), toast:$("toast"), lettersDrawer:$("lettersDrawer"),
@@ -327,7 +338,8 @@
       bucketList:$("bucketList"), maskSurprise:$("maskSurprise"), loveBurst:$("loveBurst"), closeLoveBurst:$("closeLoveBurst"),
       installBtn:$("installBtn"), canvas:$("bgCanvas"), syncStatus:$("syncStatus"), surpriseCard:$("surpriseCard"), closeSurpriseCard:$("closeSurpriseCard"),
       photoFileInput:$("photoFileInput"), addPhotoBtn:$("addPhotoBtn"), photoGrid:$("photoGrid"), photoBook:$("photoBook"), openPhotoBook:$("openPhotoBook"), closePhotoBook:$("closePhotoBook"),
-      photoCount:$("photoCount"), storageUsage:$("storageUsage"), photoViewerModal:$("photoViewerModal"), viewerImage:$("viewerImage"), closePhotoViewer:$("closePhotoViewer"), photoViewerCount:$("photoViewerCount")
+      photoCount:$("photoCount"), storageUsage:$("storageUsage"), photoViewerModal:$("photoViewerModal"), viewerImage:$("viewerImage"), closePhotoViewer:$("closePhotoViewer"), photoViewerCount:$("photoViewerCount"),
+      foodInput:$("foodInput"), addFoodBtn:$("addFoodBtn"), foodList:$("foodList")
     };
     const uid = () => Math.random().toString(36).slice(2, 11);
     const saveLocal = (k,v) => localStorage.setItem(k, JSON.stringify(v));
@@ -478,6 +490,34 @@
       const d = e.target.closest(".delBucket");
       if(t){ const item=state.bucket.find((b)=>b.id===t.dataset.id); if(item) item.done=!item.done; persistBucket(); renderBucket(); }
       if(d){ state.bucket = state.bucket.filter((b)=>b.id!==d.dataset.id); persistBucket(); renderBucket(); }
+    });
+
+    // Food list
+    function renderFood(){
+      els.foodList.innerHTML = "";
+      if(!state.food.length){ els.foodList.innerHTML = `<li class="text-pink-100/75 text-xs">Add your first food craving 🍽️</li>`; return; }
+      state.food.forEach((item) => {
+        const li=document.createElement("li");
+        li.className="chip p-2 flex items-center gap-2";
+        li.innerHTML = `<button class="toggleFood flex-1 text-left ${item.done ? "line-through text-pink-200/80" : ""}" data-id="${item.id}">${item.done ? "😋" : "🤤"} ${item.text}</button><button class="delFood text-xs text-pink-200" data-id="${item.id}">Delete</button>`;
+        els.foodList.appendChild(li);
+      });
+    }
+    function addFood(){
+      const text = els.foodInput.value.trim();
+      if(!text) return;
+      state.food.unshift({ id: uid(), text, done: false });
+      persistFood();
+      els.foodInput.value = "";
+      renderFood();
+    }
+    els.addFoodBtn.addEventListener("click", addFood);
+    els.foodInput.addEventListener("keydown", (e) => { if(e.key==="Enter") addFood(); });
+    els.foodList.addEventListener("click", (e) => {
+      const t = e.target.closest(".toggleFood");
+      const d = e.target.closest(".delFood");
+      if(t){ const item=state.food.find((f)=>f.id===t.dataset.id); if(item) item.done=!item.done; persistFood(); renderFood(); }
+      if(d){ state.food = state.food.filter((f)=>f.id!==d.dataset.id); persistFood(); renderFood(); }
     });
 
     // Photo album
@@ -645,6 +685,9 @@ self.addEventListener("fetch",e=>{
       if(db && bucketRef){ set(bucketRef, state.bucket); }
       else saveLocal(BUCKET_KEY, state.bucket);
     }
+    function persistFood(){
+      saveLocal(FOOD_KEY, state.food);
+    }
     function persistPhotos(){
       saveLocal(PHOTOS_KEY, state.photos);
     }
@@ -653,8 +696,9 @@ self.addEventListener("fetch",e=>{
         state.songs = loadLocal(SONG_KEY, []);
         state.bucket = loadLocal(BUCKET_KEY, []);
         state.photos = loadLocal(PHOTOS_KEY, []);
+        state.food = loadLocal(FOOD_KEY, []);
         els.syncStatus.textContent = "Sync mode: localStorage only (single device)";
-        renderSongs(); renderBucket(); renderPhotos(); updateStorageInfo();
+        renderSongs(); renderBucket(); renderPhotos(); renderFood(); updateStorageInfo();
         return;
       }
       try{
