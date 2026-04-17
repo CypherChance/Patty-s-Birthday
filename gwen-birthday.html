@@ -128,6 +128,14 @@
     .book-content::-webkit-scrollbar-thumb:hover{background:rgba(255,79,216,.7)}
     .add-photo-section{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
     .photo-file-input{flex:1;min-width:200px;padding:10px;border:2px dashed rgba(255,79,216,.5);border-radius:10px;background:rgba(255,255,255,.5);font-size:.9rem;color:#555;cursor:pointer}
+    .photo-viewer-modal{position:fixed;inset:0;background:rgba(0,0,0,.95);display:none;place-items:center;padding:20px;z-index:75;backdrop-filter:blur(12px)}
+    .photo-viewer-modal.show{display:grid}
+    .photo-viewer-container{position:relative;max-width:90vw;max-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .photo-viewer-image{max-width:100%;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 0 40px rgba(255,79,216,.6);animation:zoomIn .4s cubic-bezier(.34,.1,.68,.55)}
+    @keyframes zoomIn{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+    .photo-viewer-close{position:absolute;top:15px;right:15px;background:#fff;border:2px solid rgba(255,79,216,.5);color:#ff4fd8;border-radius:50%;width:45px;height:45px;font-size:1.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:85}
+    .photo-viewer-close:hover{background:rgba(255,79,216,.1);border-color:#ff4fd8}
+    .photo-viewer-nav{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;font-size:.9rem;background:rgba(0,0,0,.7);padding:8px 16px;border-radius:20px;border:1px solid rgba(255,79,216,.4)}
     @media (max-width:640px){
       main{padding-inline:12px}
       .cake{width:clamp(200px,72vw,300px)}
@@ -255,6 +263,16 @@
     </div>
   </div>
 
+  <div id="photoViewerModal" class="photo-viewer-modal">
+    <div class="photo-viewer-container">
+      <button id="closePhotoViewer" class="photo-viewer-close">✕</button>
+      <img id="viewerImage" class="photo-viewer-image" src="" alt="Zoomed photo"/>
+      <div class="photo-viewer-nav">
+        <span id="photoViewerCount">1 / 1</span>
+      </div>
+    </div>
+  </div>
+
   <div id="letterModal1" class="modal"><article class="letter"><div class="flex justify-between items-center"><h4 class="comic text-xl font-bold text-pink-100">For My Gwen</h4><button class="btn text-sm close-letter">Close</button></div><div class="mt-4 leading-relaxed text-pink-50/95 text-[0.98rem]"><p>My love,</p><p class="mt-3">[Replace this with your personal message.]</p><p class="mt-3">Forever yours,</p><p class="mt-1 text-pink-200 font-semibold">Your Spider-Man 🕷️❤️</p></div></article></div>
   <div id="letterModal2" class="modal"><article class="letter"><div class="flex justify-between items-center"><h4 class="comic text-xl font-bold text-pink-100">From Your Spider-Man</h4><button class="btn text-sm close-letter">Close</button></div><div class="mt-5 leading-relaxed text-pink-50/95 text-[1.02rem]"><p>You are my Gwen Stacy... and I am your Spider-Man. No matter which universe we’re in, I will always find you and love you. Happy Birthday, my everything. ❤️</p></div></article></div>
 
@@ -309,7 +327,7 @@
       bucketList:$("bucketList"), maskSurprise:$("maskSurprise"), loveBurst:$("loveBurst"), closeLoveBurst:$("closeLoveBurst"),
       installBtn:$("installBtn"), canvas:$("bgCanvas"), syncStatus:$("syncStatus"), surpriseCard:$("surpriseCard"), closeSurpriseCard:$("closeSurpriseCard"),
       photoFileInput:$("photoFileInput"), addPhotoBtn:$("addPhotoBtn"), photoGrid:$("photoGrid"), photoBook:$("photoBook"), openPhotoBook:$("openPhotoBook"), closePhotoBook:$("closePhotoBook"),
-      photoCount:$("photoCount"), storageUsage:$("storageUsage")
+      photoCount:$("photoCount"), storageUsage:$("storageUsage"), photoViewerModal:$("photoViewerModal"), viewerImage:$("viewerImage"), closePhotoViewer:$("closePhotoViewer"), photoViewerCount:$("photoViewerCount")
     };
     const uid = () => Math.random().toString(36).slice(2, 11);
     const saveLocal = (k,v) => localStorage.setItem(k, JSON.stringify(v));
@@ -485,7 +503,7 @@
     function renderPhotos(){
       els.photoGrid.innerHTML = "";
       if(!state.photos.length){ els.photoGrid.innerHTML = `<div class="text-pink-100/75 text-xs col-span-full py-4">No photos yet. Add your first memory 💕</div>`; return; }
-      state.photos.forEach((photo) => {
+      state.photos.forEach((photo, index) => {
         const div=document.createElement("div");
         div.className="photo-item";
         const img = document.createElement("img");
@@ -493,8 +511,15 @@
         img.alt = "Memory";
         img.style.opacity = "0";
         img.style.transition = "opacity .3s";
+        img.style.cursor = "pointer";
         img.onload = () => { img.style.opacity = "1"; };
         img.onerror = () => { div.remove(); };
+        // Add click to zoom
+        img.addEventListener("click", () => {
+          els.viewerImage.src = photo.url;
+          els.photoViewerCount.textContent = `${index + 1} / ${state.photos.length}`;
+          els.photoViewerModal.classList.add("show");
+        });
         const btn = document.createElement("button");
         btn.className = "photo-delete";
         btn.textContent = "✕";
@@ -563,6 +588,11 @@
     els.openPhotoBook.addEventListener("click", () => els.photoBook.classList.add("show"));
     els.closePhotoBook.addEventListener("click", () => els.photoBook.classList.remove("show"));
     els.photoBook.addEventListener("click", (e) => { if(e.target===els.photoBook) els.photoBook.classList.remove("show"); });
+    
+    // Photo viewer
+    els.closePhotoViewer.addEventListener("click", () => els.photoViewerModal.classList.remove("show"));
+    els.photoViewerModal.addEventListener("click", (e) => { if(e.target===els.photoViewerModal) els.photoViewerModal.classList.remove("show"); });
+    document.addEventListener("keydown", (e) => { if(e.key==="Escape" && els.photoViewerModal.classList.contains("show")) els.photoViewerModal.classList.remove("show"); });
 
     // PWA install
     let deferredPrompt = null;
