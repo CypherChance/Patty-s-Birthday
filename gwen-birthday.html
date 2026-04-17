@@ -512,18 +512,49 @@
       });
       updateStorageInfo();
     }
+    function compressImage(dataUrl, callback){
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+        
+        // Resize if too large (max 1200px on longest side)
+        const maxDim = 1200;
+        if(width > height && width > maxDim){
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else if(height > maxDim){
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Compress using canvas.toDataURL with quality=0.75 (75%)
+        const compressedUrl = canvas.toDataURL("image/jpeg", 0.75);
+        callback(compressedUrl);
+      };
+      img.onerror = () => toast("Failed to load image");
+      img.src = dataUrl;
+    }
     function addPhoto(){
       const file = els.photoFileInput.files[0];
       if(!file) return;
       const reader = new FileReader();
       reader.onload = (e) => {
-        const dataUrl = e.target.result;
-        state.photos.unshift({ id: uid(), url: dataUrl });
-        persistPhotos();
-        els.photoFileInput.value = "";
-        renderPhotos();
-        updateStorageInfo();
-        toast("Photo added to Great Memories 📸");
+        const originalUrl = e.target.result;
+        compressImage(originalUrl, (compressedUrl) => {
+          state.photos.unshift({ id: uid(), url: compressedUrl });
+          persistPhotos();
+          els.photoFileInput.value = "";
+          renderPhotos();
+          updateStorageInfo();
+          toast("Photo added to Great Memories 📸");
+        });
       };
       reader.onerror = () => toast("Failed to read file");
       reader.readAsDataURL(file);
