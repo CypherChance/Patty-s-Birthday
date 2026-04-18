@@ -675,6 +675,7 @@ self.addEventListener("fetch",e=>{
     let songsRef = null;
     let bucketRef = null;
     let foodRef = null;
+    let photosRef = null;
     function hasFirebaseConfig(){
       const f = CONFIG.firebase;
       return f.apiKey && f.authDomain && f.databaseURL && f.projectId && f.appId;
@@ -692,7 +693,8 @@ self.addEventListener("fetch",e=>{
       else saveLocal(FOOD_KEY, state.food);
     }
     function persistPhotos(){
-      saveLocal(PHOTOS_KEY, state.photos);
+      if(db && photosRef){ set(photosRef, state.photos); }
+      else saveLocal(PHOTOS_KEY, state.photos);
     }
     function initSync(){
       if(!hasFirebaseConfig()){
@@ -710,11 +712,11 @@ self.addEventListener("fetch",e=>{
         songsRef = ref(db, `rooms/${CONFIG.roomId}/songs`);
         bucketRef = ref(db, `rooms/${CONFIG.roomId}/bucket`);
         foodRef = ref(db, `rooms/${CONFIG.roomId}/food`);
+        photosRef = ref(db, `rooms/${CONFIG.roomId}/photos`);
         onValue(songsRef, (snap) => { const val = snap.val(); state.songs = Array.isArray(val) ? val : []; renderSongs(); });
         onValue(bucketRef, (snap) => { const val = snap.val(); state.bucket = Array.isArray(val) ? val : []; renderBucket(); });
         onValue(foodRef, (snap) => { const val = snap.val(); state.food = Array.isArray(val) ? val : []; renderFood(); });
-        state.photos = loadLocal(PHOTOS_KEY, []);
-        renderPhotos(); updateStorageInfo();
+        onValue(photosRef, (snap) => { const val = snap.val(); state.photos = Array.isArray(val) ? val : []; renderPhotos(); updateStorageInfo(); });
         els.syncStatus.textContent = "Sync mode: Firebase real-time (shared)";
         state.remote = true;
       } catch {
