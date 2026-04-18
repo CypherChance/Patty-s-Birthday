@@ -674,6 +674,7 @@ self.addEventListener("fetch",e=>{
     let db = null;
     let songsRef = null;
     let bucketRef = null;
+    let foodRef = null;
     function hasFirebaseConfig(){
       const f = CONFIG.firebase;
       return f.apiKey && f.authDomain && f.databaseURL && f.projectId && f.appId;
@@ -687,7 +688,8 @@ self.addEventListener("fetch",e=>{
       else saveLocal(BUCKET_KEY, state.bucket);
     }
     function persistFood(){
-      saveLocal(FOOD_KEY, state.food);
+      if(db && foodRef){ set(foodRef, state.food); }
+      else saveLocal(FOOD_KEY, state.food);
     }
     function persistPhotos(){
       saveLocal(PHOTOS_KEY, state.photos);
@@ -707,8 +709,10 @@ self.addEventListener("fetch",e=>{
         db = getDatabase(app);
         songsRef = ref(db, `rooms/${CONFIG.roomId}/songs`);
         bucketRef = ref(db, `rooms/${CONFIG.roomId}/bucket`);
+        foodRef = ref(db, `rooms/${CONFIG.roomId}/food`);
         onValue(songsRef, (snap) => { const val = snap.val(); state.songs = Array.isArray(val) ? val : []; renderSongs(); });
         onValue(bucketRef, (snap) => { const val = snap.val(); state.bucket = Array.isArray(val) ? val : []; renderBucket(); });
+        onValue(foodRef, (snap) => { const val = snap.val(); state.food = Array.isArray(val) ? val : []; renderFood(); });
         state.photos = loadLocal(PHOTOS_KEY, []);
         renderPhotos(); updateStorageInfo();
         els.syncStatus.textContent = "Sync mode: Firebase real-time (shared)";
@@ -717,8 +721,9 @@ self.addEventListener("fetch",e=>{
         state.songs = loadLocal(SONG_KEY, []);
         state.bucket = loadLocal(BUCKET_KEY, []);
         state.photos = loadLocal(PHOTOS_KEY, []);
+        state.food = loadLocal(FOOD_KEY, []);
         els.syncStatus.textContent = "Sync failed, fallback: localStorage only";
-        renderSongs(); renderBucket(); renderPhotos(); updateStorageInfo();
+        renderSongs(); renderBucket(); renderPhotos(); renderFood(); updateStorageInfo();
       }
     }
 
