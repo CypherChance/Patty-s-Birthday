@@ -377,8 +377,14 @@
     els.closeLoveBurst.addEventListener("click", () => els.loveBurst.classList.remove("show"));
 
     // Letters
-    const openDrawer = () => els.lettersDrawer.classList.add("open");
-    const closeDrawer = () => els.lettersDrawer.classList.remove("open");
+    const openDrawer = () => {
+      els.lettersDrawer.classList.add("open");
+      els.maskSurprise.style.display = "none";
+    };
+    const closeDrawer = () => {
+      els.lettersDrawer.classList.remove("open");
+      els.maskSurprise.style.display = "grid";
+    };
     const openModal = (m) => m.classList.add("show");
     const closeModal = (m) => m.classList.remove("show");
     els.openDrawerBtn.addEventListener("click", openDrawer);
