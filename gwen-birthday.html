@@ -200,6 +200,7 @@
 
     <div class="text-center mt-6">
       <button id="openDrawerBtn" class="btn text-sm">Open Love Letters 💌</button>
+      <button id="ifeel" class="btn text-sm ml-2">I FEEL 💭</button>
       <button id="installBtn" class="btn text-sm ml-2 hidden">Install App 📲</button>
     </div>
   </main>
@@ -303,6 +304,31 @@
     </div>
   </div>
 
+  <div id="emotionModal" class="modal">
+    <div style="background:linear-gradient(135deg,rgba(255,79,216,.18),rgba(130,61,255,.12));border:2px solid rgba(255,100,200,.45);border-radius:24px;padding:40px 30px;max-width:500px;width:min(96vw,500px);text-align:center;box-shadow:0 0 60px rgba(255,79,216,.4)">
+      <h2 class="comic text-3xl font-bold text-pink-100 mb-6">How do you feel today? 💭</h2>
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <button class="emotion-btn btn py-3" data-emotion="happy">😊 Happy</button>
+        <button class="emotion-btn btn py-3" data-emotion="sad">😢 Sad</button>
+        <button class="emotion-btn btn py-3" data-emotion="nervous">😰 Nervous</button>
+        <button class="emotion-btn btn py-3" data-emotion="doubtful">🤔 Doubtful</button>
+        <button class="emotion-btn btn py-3" data-emotion="unworthy">😔 Unworthy</button>
+        <button class="emotion-btn btn py-3" data-emotion="missing">🥺 Missing You</button>
+      </div>
+      <button id="closeEmotionModal" class="btn text-sm">Close</button>
+    </div>
+  </div>
+
+  <div id="verseModal" class="modal">
+    <article class="letter" style="max-width:600px">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="comic text-2xl font-bold text-pink-100" id="verseTitle">Bible Verse</h3>
+        <button id="closeVerseModal" class="btn text-sm">Close</button>
+      </div>
+      <div class="leading-relaxed text-pink-50/95 text-[0.98rem]" id="verseContent"></div>
+    </article>
+  </div>
+
   <div id="toast"></div>
 
   <script type="module">
@@ -341,7 +367,8 @@
       installBtn:$("installBtn"), canvas:$("bgCanvas"), syncStatus:$("syncStatus"), surpriseCard:$("surpriseCard"), closeSurpriseCard:$("closeSurpriseCard"),
       photoFileInput:$("photoFileInput"), addPhotoBtn:$("addPhotoBtn"), photoGrid:$("photoGrid"), photoBook:$("photoBook"), openPhotoBook:$("openPhotoBook"), closePhotoBook:$("closePhotoBook"),
       photoCount:$("photoCount"), storageUsage:$("storageUsage"), photoViewerModal:$("photoViewerModal"), viewerImage:$("viewerImage"), closePhotoViewer:$("closePhotoViewer"), photoViewerCount:$("photoViewerCount"),
-      foodInput:$("foodInput"), addFoodBtn:$("addFoodBtn"), foodList:$("foodList")
+      foodInput:$("foodInput"), addFoodBtn:$("addFoodBtn"), foodList:$("foodList"), ifeel:$("ifeel"), emotionModal:$("emotionModal"), closeEmotionModal:$("closeEmotionModal"),
+      verseModal:$("verseModal"), verseTitle:$("verseTitle"), verseContent:$("verseContent"), closeVerseModal:$("closeVerseModal")
     };
     const uid = () => Math.random().toString(36).slice(2, 11);
     const saveLocal = (k,v) => localStorage.setItem(k, JSON.stringify(v));
@@ -394,6 +421,30 @@
     els.openLetter2.addEventListener("click", () => openModal(els.letterModal2));
     document.querySelectorAll(".close-letter").forEach((btn) => btn.addEventListener("click", () => { closeModal(els.letterModal1); closeModal(els.letterModal2); }));
     [els.letterModal1, els.letterModal2].forEach((m) => m.addEventListener("click", (e) => { if(e.target===m) closeModal(m); }));
+
+    // I FEEL - Bible Verses
+    const verses = {
+      happy: { reference: "1 Chronicles 16:34 (ESV)", text: "Oh give thanks to the Lord, for he is good;<br>for his steadfast love endures forever!" },
+      sad: { reference: "Isaiah 49:13 (ESV)", text: "Sing for joy, O heavens, and exult, O earth;<br>break forth, O mountains, into singing!<br>For the Lord has comforted his people<br>and will have compassion on his afflicted." },
+      nervous: { reference: "Isaiah 41:10 (ESV)", text: "fear not, for I am with you;<br>be not dismayed, for I am your God;<br>I will strengthen you, I will help you,<br>I will uphold you with my righteous right hand." },
+      doubtful: { reference: "Joshua 21:45 (ESV)", text: "Not one word of all the good promises that the Lord had made to the house of Israel had failed; all came to pass." },
+      unworthy: { reference: "Ephesians 2:8-9 (ESV)", text: "For by grace you have been saved through faith. And this is not your own doing; it is the gift of God, not a result of works, so that no one may boast." },
+      missing: { reference: "Ecclesiastes 3:11 (ESV)", text: "He has made everything beautiful in its time. Also, he has put eternity into man's heart, yet so that he cannot find out what God has done from the beginning to the end." }
+    };
+    els.ifeel.addEventListener("click", () => openModal(els.emotionModal));
+    els.closeEmotionModal.addEventListener("click", () => closeModal(els.emotionModal));
+    document.querySelectorAll(".emotion-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const emotion = btn.dataset.emotion;
+        const verse = verses[emotion];
+        els.verseTitle.innerHTML = verse.reference;
+        els.verseContent.innerHTML = `<p>${verse.text}</p>`;
+        closeModal(els.emotionModal);
+        openModal(els.verseModal);
+      });
+    });
+    els.closeVerseModal.addEventListener("click", () => closeModal(els.verseModal));
+    els.verseModal.addEventListener("click", (e) => { if(e.target===els.verseModal) closeModal(els.verseModal); });
 
     // Surprise mask messages
     const surpriseMessages = [
